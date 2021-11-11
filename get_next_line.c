@@ -1,112 +1,91 @@
-#include "head.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rchallie <rchallie@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2019/10/18 10:20:38 by rchallie          #+#    #+#             */
+/*   Updated: 2019/11/04 10:24:41 by rchallie         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-int	ft_strlen(char *s)
+#include "get_next_line.h"
+
+char	*get_save(char *save)
 {
-	int	i;
+	char	*rtn;
+	int		i;
+	int		j;
 
 	i = 0;
-	if (!s)
+	j = 0;
+	if (!save)
 		return (0);
-	while (s[i] != '\0')
+	while (save[i] && save[i] != '\n')
 		i++;
-	return (i);
-}
-
-int is_nl(char *s)
-{
-	if (!s)
-		return (0);
-	while (*s != '\0')
+	if (!save[i])
 	{
-		if (*s == '\n')
-			return (1);
-		s++;
+		free(save);
+		return (0);
 	}
-	return (0);
+	if (!(rtn = malloc(sizeof(char) * ((ft_strlen(save) - i) + 1))))
+		return (0);
+	i++;
+	while (save[i])
+		rtn[j++] = save[i++];
+	rtn[j] = '\0';
+	free(save);
+	return (rtn);
 }
 
-char *str_add(char *s1, char *s2)
-{
-    int        l;
-    char    *s;
-    int        i;
-    int        p;
-    
-    i = 0;
-    l = ft_strlen(s1) + ft_strlen(s2);
-    s = (char *)malloc(sizeof(char) * l + 1);
-    while (s1 != 0 && s1[i] != '\0')
-    {
-        s[i] = s1[i];
-        i++;
-    }
-    p = i;
-    i = 0;
-    while (s2[i] != '\0')
-    {
-        s[i + p] = s2[i];
-        i++;
-    }
-    s[i + p] = '\0';
-    free(s1);
-    return (s);
-}
-
-char    *after_nl(char *s)
-{
-    int        i;
-    int        k;
-    char    *res;
-
-    i = 0;
-    while (s[i] != '\n')
-        i++;
-    i++;
-    res = (char *)malloc(sizeof(char) * (ft_strlen(s) - i) + 1);
-    res[i] = '\0';
-    k = i;
-    while (s[i] != '\0')
-    {
-        res[i - k] = s[i];
-        i++;
-    }
-    return (res);
-}
-
-char	*before_nl(char *s)
+char	*get_line(char *str)
 {
 	int		i;
-	char	*res;
+	char	*rtn;
 
 	i = 0;
-	while (s[i] != '\n')
+	if (!str)
+		return (0);
+	while (str[i] && str[i] != '\n')
 		i++;
-	res = (char *)malloc(sizeof(char) * i + 1);
-	res[i] = '\0';
+	if (!(rtn = malloc(sizeof(char) * (i + 1))))
+		return (0);
 	i = 0;
-	while (s[i] != '\n')
+	while (str[i] && str[i] != '\n')
 	{
-		res[i] = s[i];
+		rtn[i] = str[i];
 		i++;
 	}
-	return (res);
+	rtn[i] = '\0';
+	return (rtn);
 }
 
-char	*get_next_line(int fd)
+int		get_next_line(int fd, char **line)
 {
-	static char	buff[BUFFER_SIZE + 1];
-	static char	*res;
-	int			ret;
-	char		*res2;
+	char			*buff;
+	static char		*save;
+	int				reader;
 
-	ret = read(fd, buff, BUFFER_SIZE);
-	while (!is_nl(res) && ret)
+	reader = 1;
+	if (fd < 0 || !line || BUFFER_SIZE <= 0)
+		return (-1);
+	if (!(buff = malloc(sizeof(char) * (BUFFER_SIZE + 1))))
+		return (-1);
+	while (!has_return(save) && reader != 0)
 	{
-		buff[ret] = '\0';
-		res = str_add(res, buff);
-		ret = read(fd, buff, BUFFER_SIZE);
+		if ((reader = read(fd, buff, BUFFER_SIZE)) == -1)
+		{
+			free(buff);
+			return (-1);
+		}
+		buff[reader] = '\0';
+		save = join_str(save, buff);
 	}
-	res2 = before_nl(res);
-	res = after_nl(res);
-	return (res2);
+	free(buff);
+	*line = get_line(save);
+	save = get_save(save);
+	if (reader == 0)
+		return (0);
+	return (1);
 }
