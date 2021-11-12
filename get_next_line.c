@@ -21,21 +21,22 @@ char	*get_save(char *save)
 	i = 0;
 	j = 0;
 	if (!save)
-		return (0);
+		return (NULL);
 	while (save[i] && save[i] != '\n')
 		i++;
 	if (!save[i])
-	{
-		free(save);
-		return (0);
-	}
-	if (!(rtn = malloc(sizeof(char) * ((ft_strlen(save) - i) + 1))))
-		return (0);
+		return (NULL);
+	rtn = malloc(sizeof(char) * ((ft_strlen(save) - i) + 1));
+	if (!rtn)
+		return (NULL);
+	rtn[j] = '\0';
 	i++;
 	while (save[i])
-		rtn[j++] = save[i++];
-	rtn[j] = '\0';
-	free(save);
+	{
+		rtn[j] = save[i];
+		i++;
+		j++;
+	}
 	return (rtn);
 }
 
@@ -49,43 +50,47 @@ char	*get_line(char *str)
 		return (0);
 	while (str[i] && str[i] != '\n')
 		i++;
-	if (!(rtn = malloc(sizeof(char) * (i + 1))))
-		return (0);
+	rtn = malloc(sizeof(char) * (i + 1));
+	if (!rtn)
+		return (NULL);
 	i = 0;
 	while (str[i] && str[i] != '\n')
 	{
 		rtn[i] = str[i];
 		i++;
 	}
+	if (str[i])
+		rtn[i] = '\n';
+	if (str[i])
+		i++;
 	rtn[i] = '\0';
+	free(str);
 	return (rtn);
 }
 
-int		get_next_line(int fd, char **line)
+char *get_next_line(int fd)
 {
-	char			*buff;
 	static char		*save;
-	int				reader;
+	char 			*save2;
+	int				ret;
+	char			buff[BUFFER_SIZE + 1];
 
-	reader = 1;
-	if (fd < 0 || !line || BUFFER_SIZE <= 0)
-		return (-1);
-	if (!(buff = malloc(sizeof(char) * (BUFFER_SIZE + 1))))
-		return (-1);
-	while (!has_return(save) && reader != 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	ret = read(fd, buff, BUFFER_SIZE);
+	while (!is_nl(save) && ret != 0)
 	{
-		if ((reader = read(fd, buff, BUFFER_SIZE)) == -1)
-		{
-			free(buff);
-			return (-1);
-		}
-		buff[reader] = '\0';
+		if (ret == -1)
+			return (NULL);
+		buff[ret] = '\0';
 		save = join_str(save, buff);
+		if (!save)
+			return (NULL);
+		ret = read(fd, buff, BUFFER_SIZE);
 	}
-	free(buff);
-	*line = get_line(save);
+	save2 = save;
 	save = get_save(save);
-	if (reader == 0)
-		return (0);
-	return (1);
+	if (save == NULL)
+		return (NULL);
+	return (get_line(save2));
 }
