@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gannemar <gannemar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/13 15:05:36 by gannemar          #+#    #+#             */
-/*   Updated: 2021/11/13 15:12:01 by gannemar         ###   ########.fr       */
+/*   Created: 2021/11/13 15:04:59 by gannemar          #+#    #+#             */
+/*   Updated: 2021/11/13 15:12:39 by gannemar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static void	init_res(t_result *res)
 {
