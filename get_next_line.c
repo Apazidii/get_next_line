@@ -12,32 +12,67 @@
 
 #include "get_next_line.h"
 
-char	*get_save(char *save)
+char *get_buff(char *buff)
 {
-	char	*rtn;
 	int		i;
-	int		j;
+	char	*res;
+
+	i = 0;
+	while (buff[i])
+		i++;
+	if (i == 0)
+		return (NULL);
+	res = (char *)malloc(sizeof(char) * (i + 1));
+	if (!res)
+		return (NULL);
+	res[i] = '\0';
+	i = 0;
+	while (buff[i])
+	{
+		res[i] = buff[i];
+		i++;
+	}
+	return (res);
+}
+
+void buff_init(char *buff)
+{
+	int	i;
+
+	i = 0;
+	if (!*buff)
+	{
+		while (i < BUFFER_SIZE)
+		{
+			buff[i] = '\0';
+			i++;
+		}
+	}
+}
+
+void	save_buff(char *save, char *buff)
+{
+	int	i;
+	int j;
 
 	i = 0;
 	j = 0;
-	if (!save)
-		return (NULL);
-	while (save[i] && save[i] != '\n')
-		i++;
-	if (!save[i])
-		return (NULL);
-	rtn = malloc(sizeof(char) * ((ft_strlen(save) - i) + 1));
-	if (!rtn)
-		return (NULL);
-	rtn[j] = '\0';
-	i++;
-	while (save[i])
+	if (*save && *buff)
 	{
-		rtn[j] = save[i];
-		i++;
-		j++;
+		while (save[i] && save[i] != '\n')
+			i++;
+		if (save[i] == '\n')
+		{
+			i++;
+			while (save[i])
+			{
+				buff[j] = save[i];
+				i++;
+				j++;
+			}
+			buff[j] = '\0';
+		}
 	}
-	return (rtn);
 }
 
 char	*get_line(char *str)
@@ -49,6 +84,8 @@ char	*get_line(char *str)
 	if (!str)
 		return (0);
 	while (str[i] && str[i] != '\n')
+		i++;
+	if (str[i] == '\n')
 		i++;
 	rtn = malloc(sizeof(char) * (i + 1));
 	if (!rtn)
@@ -70,11 +107,11 @@ char	*get_line(char *str)
 
 char *get_next_line(int fd)
 {
-	static char		*save;
-	char 			*save2;
+	char		*save;
 	int				ret;
-	char			buff[BUFFER_SIZE + 1];
+	static char		buff[BUFFER_SIZE + 1];
 
+	save = get_buff(buff);
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	ret = read(fd, buff, BUFFER_SIZE);
@@ -88,9 +125,11 @@ char *get_next_line(int fd)
 			return (NULL);
 		ret = read(fd, buff, BUFFER_SIZE);
 	}
-	save2 = save;
-	save = get_save(save);
-	if (save == NULL)
-		return (NULL);
-	return (get_line(save2));
+	save_buff(save, buff);
+	return (get_line(save));
 }
+
+
+
+
+

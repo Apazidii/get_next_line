@@ -7,7 +7,7 @@ FUNCS 	=	main.c					\
 
 FUNCSO = ${FUNCS:.c=.o}
 GCC = gcc
-CFLAGS = -c -D BUFFER_SIZE=42
+CFLAGS = -c
 HDRS = get_next_line.h 
 
 all:		${NAME}
