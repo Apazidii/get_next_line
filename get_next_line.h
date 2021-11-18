@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: gannemar <gannemar@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/13 15:05:44 by gannemar          #+#    #+#             */
-/*   Updated: 2021/11/13 15:33:01 by gannemar         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
@@ -18,19 +6,23 @@
 # include <limits.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1024
+#  define BUFFER_SIZE 12
+# endif
+
+# ifndef OPEN_MAX
+#  define OPEN_MAX 265
 # endif
 
 typedef struct s_buff
 {
-	char	arr[BUFFER_SIZE];
+	char	arr[BUFFER_SIZE + 1];
 	size_t	next_char_idx;
 	ssize_t	readed_left;
 }	t_buff;
 
 typedef struct s_list
 {
-	char			arr[BUFFER_SIZE];
+	char			arr[BUFFER_SIZE + 1];
 	size_t			len;
 	struct s_list	*next;
 }	t_list;
