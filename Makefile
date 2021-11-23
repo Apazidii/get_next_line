@@ -1,34 +1,41 @@
-NAME	= run
-FUNCS 	=	get_next_line.c			\
-			get_next_line_utils.c	\
-			main.c					\
+NAME = libft.a
 
-			
+CC = gcc
+CFLAGS = -Wall -Wextra -Werror
+AR = ar rcs
+RM = rm -f
+MAKE = Makefile
 
-FUNCSO = ${FUNCS:.c=.o}
-GCC = gcc
-CFLAGS = -c -D BUFFER_SIZE=30
-HDRS = get_next_line.h 
+FUNCS		=		get_next_line.c				get_next_line_utils.c
+FUNCS_B		=		get_next_line_bonus.c		get_next_line_utils_bonus.c
 
-all:		${NAME}
-			make clean
-			clear
-			./${NAME}
+FUNCS_O		=		$(FUNCS:.c=.o)
+FUNCS_O_B	=		$(FUNCS_B:.c=.o)
 
-nc:			${NAME}
-			make clean
-			./${NAME}	
+HDR			=		get_next_line.h
+HDR_B		=		get_next_line_bonus.h
 
-${NAME}:	${FUNCSO} ${HDRS} 
-			${GCC} ${FUNCSO} -o ${NAME}
-			
-.c.o:		
-			${GCC} ${CFLAGS} $< -o ${<:.c=.o} 
+.c.o: $(FUNCS)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(NAME): $(FUNCS_O)
+	$(AR) $@ $^
+
+$(FUNCS_O): $(HDR) $(MAKE) 
+
+$(FUNCS_O_B): $(HDR_B) $(MAKE)
+
+bonus: $(FUNCS_O_B)
+	$(AR) $(NAME) $^
+
+all: $(NAME)
 
 clean:
-		rm -f ${FUNCSO}
+	$(RM) $(FUNCS_O) $(FUNCS_O_B)
 
-fclean:	clean
-		rm -f ${NAME}
+fclean: clean
+	$(RM) $(NAME)
 
-.PHONY:	all clean fclean
+re: clean all
+
+.PHONY: bonus all clean fclean re

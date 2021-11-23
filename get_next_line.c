@@ -1,110 +1,105 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: gannemar <gannemar@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/13 15:05:36 by gannemar          #+#    #+#             */
-/*   Updated: 2021/11/13 15:12:01 by gannemar         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "get_next_line.h"
 
-static void	init_res(t_result *res)
+static void move_buff(t_buff *buff, t_list *list, int *res)
 {
-	res->arr = NULL;
-	res->size = 0;
+	while ((buff->ret > 0) && (buff->arr[buff->idc] != '\n'))
+	{
+		list->arr[list->len] = buff->arr[buff->idc];
+		buff->idc++;
+		list->len++;
+		buff->ret--;
+		*res = *res + 1;
+	}	
 }
 
-static int	copy_buff_to_list_elem(t_buff *buff, t_list *list, t_result *res)
+static int	copy_buff(t_buff *buff, t_list *list, int *res)
 {
 	int	is_line_end;
 
 	is_line_end = 0;
-	while ((buff->readed_left > 0)
-		&& (buff->arr[buff->next_char_idx] != '\n'))
-	{
-		list->arr[list->len++] = buff->arr[buff->next_char_idx++];
-		buff->readed_left--;
-		res->size++;
-	}
-	if ((buff->readed_left > 0)
-		&& (buff->arr[buff->next_char_idx] == '\n'))
+	move_buff(buff, list, res);
+	if ((buff->ret > 0) && (buff->arr[buff->idc] == '\n'))
 	{
 		is_line_end = 1;
-		list->arr[list->len++] = buff->arr[buff->next_char_idx++];
-		res->size++;
-		buff->readed_left--;
+		list->arr[list->len] = buff->arr[buff->idc];
+		buff->idc++;
+		list->len++;
+		*res = *res + 1;
+		buff->ret--;
 	}
-	if (buff->readed_left == 0)
-		buff->next_char_idx = 0;
+	if (buff->ret == 0)
+		buff->idc = 0;
 	return (is_line_end);
 }
 
-static t_list	*line_to_list(t_buff *buff, t_list *list, t_result *res, int fd)
+static t_list	*read_list(t_buff *buff, t_list *list, int *res, int fd)
 {
-	if (copy_buff_to_list_elem(buff, list, res))
+	if (copy_buff(buff, list, res))
 		return (list);
-	buff->readed_left = read(fd, buff->arr, BUFFER_SIZE);
-	while (buff->readed_left > 0)
+	buff->ret = read(fd, buff->arr, BUFFER_SIZE);
+	while (buff->ret > 0)
 	{
-		list = push_back_list(list);
+		list = list_next(list);
 		if (!list)
 			return (NULL);
-		if (copy_buff_to_list_elem(buff, list, res))
+		if (copy_buff(buff, list, res))
 			return (list);
-		buff->readed_left = read(fd, buff->arr, BUFFER_SIZE);
+		buff->ret = read(fd, buff->arr, BUFFER_SIZE);
 	}
-	if (buff->readed_left == -1)
+	if (buff->ret == -1)
 	{
-		buff->readed_left = 0;
+		buff->ret = 0;
 		return (NULL);
 	}
 	return (list);
 }
 
-static char	*list_to_str(t_list *list, t_result *res)
+static char	*gen_res(t_list *list, char **res, int res_size)
 {
-	size_t	str_idx;
-	size_t	list_elem_idx;
+	unsigned int	i;
+	unsigned int	j;
 
-	if (res->size == 0)
+	if (res_size == 0)
 		return (NULL);
-	res->arr = (char *)malloc(sizeof(char) * (++res->size));
-	if (!res->arr)
+	*res = (char *)malloc(sizeof(char) * (res_size + 1));
+	if (!*res)
 		return (NULL);
-	str_idx = 0;
-	while (list != NULL)
+	i = 0;
+	while (list)
 	{
-		list_elem_idx = 0;
-		while (list_elem_idx < list->len)
-			res->arr[str_idx++] = list->arr[list_elem_idx++];
+		j = 0;
+		while (j < list->len)
+		{
+			(*res)[i] = list->arr[j];
+			i++;
+			j++;
+		}
 		list = list->next;
 	}
-	res->arr[res->size - 1] = '\0';
-	return (res->arr);
+	(*res)[res_size] = '\0';
+	return (*res);
 }
 
 char	*get_next_line(int fd)
 {
 	static t_buff	buffs[OPEN_MAX];
 	t_list			*list;
-	t_result		res;
+	char			*res;
+	int				res_size;
 
+	res_size = 0;
+	res = NULL;
 	if (fd < 0 || fd > OPEN_MAX || BUFFER_SIZE < 1)
 		return (NULL);
-	init_res(&res);
 	list = new_list();
 	if (!list)
 		return (NULL);
-	if (!line_to_list(&buffs[fd], list, &res, fd))
+	if (!read_list(&buffs[fd], list, &res_size, fd))
 	{
 		free_list(&list);
 		return (NULL);
 	}
-	list_to_str(list, &res);
+	gen_res(list, &res, res_size);
 	free_list(&list);
-	return (res.arr);
+	return (res);
 }

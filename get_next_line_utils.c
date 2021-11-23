@@ -1,30 +1,18 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: gannemar <gannemar@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/13 15:05:30 by gannemar          #+#    #+#             */
-/*   Updated: 2021/11/13 15:05:32 by gannemar         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "get_next_line.h"
 
 t_list	*new_list(void)
 {
-	t_list	*new;
+	t_list	*nlist;
 
-	new = (t_list *)malloc(sizeof(t_list));
-	if (!new)
+	nlist = (t_list *)malloc(sizeof(t_list));
+	if (!nlist)
 		return (NULL);
-	new->len = 0;
-	new->next = NULL;
-	return (new);
+	nlist->len = 0;
+	nlist->next = NULL;
+	return (nlist);
 }
 
-t_list	*push_back_list(t_list *last)
+t_list	*list_next(t_list *last)
 {
 	if (!last)
 		return (NULL);
@@ -34,25 +22,25 @@ t_list	*push_back_list(t_list *last)
 
 void	free_list_elem(t_list *elem)
 {
-	if (!elem)
-		return ;
-	free(elem);
+	if (elem)
+		free(elem);
 }
 
 void	free_list(t_list **list)
 {
-	t_list	*current;
-	t_list	*prev;
+	t_list	*a;
+	t_list	*b;
 
-	if (!*list)
-		return ;
-	current = *list;
-	while (current->next != NULL)
+	if (*list)
 	{
-		prev = current;
-		current = current->next;
-		free_list_elem(prev);
+		a = *list;
+		while (a->next != NULL)
+		{
+			b = a;
+			a = a->next;
+			free_list_elem(b);
+		}
+		free_list_elem(a);
+		*list = NULL;
 	}
-	free_list_elem(current);
-	*list = NULL;
 }

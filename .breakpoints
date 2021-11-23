@@ -1,25 +1,11 @@
 {
   "files": {
-    "get_next_line.c": [
-      {
-        "id": "c6da82ea-4895-4505-9ef3-9e54a0a37160",
-        "line": 50,
-        "version": 3935,
-        "index": 1722
-      },
-      {
-        "id": "604b0013-d605-4986-ae7d-720816b7d4aa",
-        "line": 102,
-        "version": 3935,
-        "index": 2777
-      }
-    ],
     "main.c": [
       {
-        "id": "54b62709-143d-4568-8967-6cedfe8eb8ba",
-        "line": 18,
-        "version": 2503,
-        "index": 317
+        "id": "df3c6d8a-9b24-483d-9bb8-3104c816edc7",
+        "line": 17,
+        "version": 2504,
+        "index": 283
       }
     ]
   }
