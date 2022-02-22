@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dgalactu <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/02 15:40:41 by dgalactu          #+#    #+#             */
-/*   Updated: 2021/12/02 15:40:57 by dgalactu         ###   ########.fr       */
+/*   Created: 2021/12/02 15:41:01 by dgalactu          #+#    #+#             */
+/*   Updated: 2021/12/02 15:41:13 by dgalactu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 t_list	*new_list(void)
 {
